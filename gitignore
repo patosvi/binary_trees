@@ -1,0 +1,10 @@
+# Ignore compiled C binaries
+*.exe
+*.out
+*.o
+# Ignore Emacs temporary files
+*~
+# Ignore autosave files
+# Files ending in `.#` are created when files are being edited
+.#*
+
