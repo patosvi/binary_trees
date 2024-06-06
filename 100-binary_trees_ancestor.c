@@ -1,89 +1,55 @@
 #include "binary_trees.h"
 
 /**
- * binary_tree_is_leaf - checks if a node is a leaf
- *
- * @node: pointer to the node to check
- * Return: 1 if node is a leaf, otherwise 0
- */
-int binary_tree_is_leaf(const binary_tree_t *node)
-{
-	int leaf = 0;
-
-	if (node && !(node->left) && !(node->right))
-		leaf = 1;
-
-	return (leaf);
-}
-
-/**
- * check_parent - checks if node has a lower/higher than its grand parent
- *
- * @tree: actual node
- * Return: 1 if actual node has an appropiartely value, 0 otherwise
- */
-int check_parent(const binary_tree_t *tree)
-{
-	const binary_tree_t *prnt;
-	const binary_tree_t *grand_prnt;
-
-	if (tree == NULL || tree->parent == NULL || tree->parent->parent == NULL)
-		return (1);
-
-	prnt = tree->parent;
-	grand_prnt = prnt->parent;
-
-	while (prnt && grand_prnt)
-	{
-		if (prnt->n < grand_prnt->n && tree->n >= grand_prnt->n)
-			return (0);
-
-		if (prnt->n > grand_prnt->n && tree->n <= grand_prnt->n)
-			return (0);
-
-		prnt = prnt->parent;
-		grand_prnt = prnt->parent;
-	}
-
-	return (1);
-}
-
-/**
- * check_is_bst - checks if binary tree is a BST
+ * recursive_depth - measures the depth of a node in a binary tree
  *
  * @tree: tree root
- * Return: 1 if tree is a BST, 0 otherwise
+ * Return: depth of a node in a binary tree
  */
-int check_is_bst(const binary_tree_t *tree)
+size_t recursive_depth(const binary_tree_t *tree)
 {
-	if (!tree)
-		return (1);
+	if (tree == NULL)
+		return (-1);
 
-	if (binary_tree_is_leaf(tree))
-		return (1);
-
-	if (tree->left && tree->left->n >= tree->n)
-		return (0);
-
-	if (tree->right && tree->right->n <= tree->n)
-		return (0);
-
-	if (!check_parent(tree->left) || !check_parent(tree->right))
-		return (0);
-
-	return (check_is_bst(tree->left) && check_is_bst(tree->right));
+	return (recursive_depth(tree->parent) + 1);
 }
 
 /**
- * binary_tree_is_bst - calls to check_is_bst to check if tree is BST
+ * binary_tree_depth - calls recursive_depth to return the depth
+ * of a node in a binary tree
  *
  * @tree: tree root
- * Return: 1 if tree is a BST, 0 otherwise
+ * Return: depth of the tree or 0 if tree is NULL;
  */
-int binary_tree_is_bst(const binary_tree_t *tree)
+size_t binary_tree_depth(const binary_tree_t *tree)
 {
-	if (!tree)
+	if (tree == NULL)
 		return (0);
 
-	return (check_is_bst(tree));
+	return (recursive_depth(tree));
+}
+
+/**
+ * binary_tree_uncle - finds the lowest common ancestor of two nodes
+ *
+ * @first: pointer to the first node
+ * @second: pointer to the second node
+ * Return: pointer to the lowest common ancestor
+ */
+binary_tree_t *binary_trees_ancestor(const binary_tree_t *first,
+				     const binary_tree_t *second)
+{
+	if (first == NULL || second == NULL)
+		return (NULL);
+
+	if (first == second)
+		return ((binary_tree_t *)first);
+
+	if (binary_tree_depth(first) > binary_tree_depth(second))
+		return (binary_trees_ancestor(first->parent, second));
+
+	if (binary_tree_depth(first) < binary_tree_depth(second))
+		return (binary_trees_ancestor(first, second->parent));
+
+	return (binary_trees_ancestor(first->parent, second->parent));
 }
